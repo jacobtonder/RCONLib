@@ -42,6 +42,8 @@ namespace RCONLib
         public void Dispose()
         {
             this.Connected = false;
+            this.Channel.Shutdown(SocketShutdown.Both);
+            this.Dispose();
         }
     }
 }
