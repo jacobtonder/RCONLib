@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 
 namespace RCONLib
 {
@@ -9,6 +10,7 @@ namespace RCONLib
         private readonly IPEndPoint Host;
         private readonly string Password;
         private readonly Socket Channel;
+        private bool Connected;
 
         public RconClient (string hostIp, ushort port, string password) : this(IPAddress.Parse(hostIp), port, password)
         {
@@ -22,11 +24,24 @@ namespace RCONLib
         {
             this.Host = host;
             this.Password = password;
+            this.Connected = false;
+            Channel = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+
+            ConnectAsync().Wait();
+        }
+
+        public async Task ConnectAsync()
+        {
+            if (Connected)
+                return;
+
+            await Channel.ConnectAsync(Host);
+            Connected = true;
         }
 
         public void Dispose()
         {
-            throw new NotImplementedException();
+            this.Connected = false;
         }
     }
 }
